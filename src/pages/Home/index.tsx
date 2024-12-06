@@ -1,18 +1,15 @@
-import {
-  Box,
-  IconButton,
-  InputAdornment,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Link, Typography } from "@mui/material";
 // import { ReactComponent as EyeIcon } from "../../assets/eye.svg";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
 import * as yup from "yup";
 import { DefaultButton } from "../../components/Button";
-import { MuiTextField } from "../../components/TextField";
+import { MuiTextFieldComponent } from "../../components/TextField";
 import { CardContainer, MainContainer, StyledImageCard } from "./styles";
+
+import "react-toastify/dist/ReactToastify.css";
 
 // Criando um objeto de validação do Yup com as propriedades do formulário
 const formSchema = yup.object({
@@ -40,7 +37,7 @@ export const Home = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid, isDirty },
   } = useForm<FORM_SCHEMA_TYPE>({
     defaultValues: {
       first_name: "",
@@ -51,8 +48,9 @@ export const Home = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const abacaxi = (data: unknown) => {
+  const onSubmit = (data: unknown) => {
     console.log("data: ", data);
+    toast.success("Formulário enviado com sucesso!");
   };
 
   useEffect(() => {
@@ -94,7 +92,7 @@ export const Home = () => {
               flexDirection: "column",
               gap: "16px",
             }}
-            onSubmit={handleSubmit(abacaxi)}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <Box
               sx={{
@@ -103,47 +101,31 @@ export const Home = () => {
               }}
             >
               {/* Criação do primeiro Controller */}
-              <Controller
-                name="first_name"
+              <MuiTextFieldComponent
                 control={control}
-                render={({ field }) => (
-                  <MuiTextField placeholder="First name" {...field} />
-                )}
+                errors={errors}
+                name="first_name"
+                placeholder="First name"
               />
               {/* Criação do segundo controller - sobrenome */}
-              <Controller
-                name="last_name"
+              <MuiTextFieldComponent
                 control={control}
-                render={({ field }) => (
-                  <MuiTextField placeholder="Last name" {...field} />
-                )}
+                errors={errors}
+                name="last_name"
+                placeholder="Last name"
               />
             </Box>
-            <Controller
+            <MuiTextFieldComponent
+              control={control}
+              errors={errors}
               name="email"
-              control={control}
-              render={({ field }) => (
-                <MuiTextField placeholder="Email" {...field} />
-              )}
+              placeholder="Email"
             />
-            <Controller
-              name="password"
+            <MuiTextFieldComponent
               control={control}
-              render={({ field }) => (
-                <MuiTextField
-                  placeholder="Enter your password"
-                  slotProps={{
-                    input: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton>{/* <EyeIcon /> */}</IconButton>
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                  {...field}
-                />
-              )}
+              errors={errors}
+              name="password"
+              placeholder="Password"
             />
             <DefaultButton
               variant="contained"
@@ -153,6 +135,7 @@ export const Home = () => {
                 backgroundColor: "#6E54B5",
               }}
               type="submit"
+              disabled={!isValid || !isDirty}
               // type="button"
             >
               <Typography>Create account</Typography>
@@ -160,6 +143,7 @@ export const Home = () => {
           </form>
         </Box>
       </Box>
+      <ToastContainer position="top-center" />
     </Box>
   );
 };
